@@ -1,7 +1,6 @@
 package com.CezaryZal;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class YahtzeeServer {
 
@@ -13,10 +12,28 @@ public class YahtzeeServer {
             "Five", 5,
             "Six", 6);
 
-    public int getPoint(List<Integer> scoreOfThrows, String category) {
+    public int getCollectedPoint(List<Integer> scoreOfThrow, String category) {
+        if (category.equals("Pair")){
+            return getCollectedPointFromPairCategory(scoreOfThrow);
+        }
+        return getCollectedPointFromSingleCategory(scoreOfThrow, category);
+    }
+
+    private int getCollectedPointFromPairCategory(List<Integer> scoreOfThrow){
+        scoreOfThrow.sort(Comparator.reverseOrder());
+
+        Integer maxPointFromThrow = scoreOfThrow.get(0);
+        if (maxPointFromThrow.equals(scoreOfThrow.get(1)) &&
+                !maxPointFromThrow.equals(scoreOfThrow.get(2))) {
+            return maxPointFromThrow * 2;
+        }
+        return 0;
+    }
+
+    private int getCollectedPointFromSingleCategory(List<Integer> scoreOfThrow, String category){
         Integer pointByCategory = pointTable.get(category);
 
-       return  scoreOfThrows.stream()
+        return scoreOfThrow.stream()
                 .filter((number) -> number.equals(pointByCategory))
                 .mapToInt(Integer::intValue)
                 .sum();
