@@ -114,4 +114,20 @@ class YahtzeeServerTest {
         assertThat(collectedPoints).isEqualTo(18);
     }
 
+    @Test
+    void shouldGetReceiveResultFromFourGropeCategoryForFiveType() {
+        List<Integer> scoreOfThrow = Arrays.asList(5, 3, 5, 5, 5);
+        String category = "Four of a kind";
+        int collectedPoints = yahtzeeServer.getCollectedPoint(scoreOfThrow, category);
+        assertThat(collectedPoints).isEqualTo(20);
+    }
+
+    @Test
+    void shouldGetReceiveResultFromFiveGropeCategoryForFourType() {
+        List<Integer> scoreOfThrow = Arrays.asList(4, 4, 4, 4, 4);
+        String category = "Yahtzee";
+        int collectedPoints = yahtzeeServer.getCollectedPoint(scoreOfThrow, category);
+        assertThat(collectedPoints).isEqualTo(50);
+    }
+
 }

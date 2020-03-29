@@ -1,8 +1,6 @@
 package com.CezaryZal;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class YahtzeeServer {
 
@@ -22,12 +20,20 @@ public class YahtzeeServer {
         }
         Map<Integer, Integer> parsedScoreOfThrow = parseScoreOfThrow(scoreOfThrow);
 
-        if (category.equals("Pair")) {
-            return getCollectedPointForSimpleCategory(parsedScoreOfThrow, 2);
-        } else if (category.equals("Two Pair")) {
-            return getCollectedPointFromTwoPairCategory(parsedScoreOfThrow);
-        } else if (category.equals("Three of a kind")) {
-            return getCollectedPointForSimpleCategory(parsedScoreOfThrow, 3);
+        switch (category) {
+            case "Pair":
+                return getCollectedPointForSimpleCategory(parsedScoreOfThrow, 2);
+            case "Two Pair":
+                return getCollectedPointFromTwoPairCategory(parsedScoreOfThrow);
+            case "Three of a kind":
+                return getCollectedPointForSimpleCategory(parsedScoreOfThrow, 3);
+            case "Four of a kind":
+                return getCollectedPointForSimpleCategory(parsedScoreOfThrow, 4);
+            case "Yahtzee":
+                if (getCollectedPointForSimpleCategory(parsedScoreOfThrow, 5) != 0){
+                    return 50;
+                }
+                return getCollectedPointForSimpleCategory(parsedScoreOfThrow, 5);
         }
         throw new IncorrectCategoryException("The Category of throw is incorrect");
     }
@@ -64,11 +70,11 @@ public class YahtzeeServer {
 
     private int getCollectedPointForSimpleCategory(
             Map<Integer, Integer> parsedScoreOfThrow,
-            int simpleCategory) {
+            int numberOfGrope) {
 
         return parsedScoreOfThrow.entrySet().stream()
-                .filter(grope -> grope.getValue() == simpleCategory)
-                .mapToInt(grope -> grope.getKey() * simpleCategory)
+                .filter(grope -> grope.getValue() == numberOfGrope)
+                .mapToInt(grope -> grope.getKey() * numberOfGrope)
                 .max()
                 .orElse(0);
     }
