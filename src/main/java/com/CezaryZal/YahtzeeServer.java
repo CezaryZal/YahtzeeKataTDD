@@ -13,6 +13,7 @@ public class YahtzeeServer {
             "Six", 6);
 
     public int getCollectedPoint(List<Integer> scoreOfThrow, String category) {
+        throwExceptionIfInputScopeIsIncorrect(scoreOfThrow);
         if (category.equals("Pair")){
             return getCollectedPointFromPairCategory(scoreOfThrow);
         }
@@ -37,5 +38,16 @@ public class YahtzeeServer {
                 .filter((number) -> number.equals(pointByCategory))
                 .mapToInt(Integer::intValue)
                 .sum();
+    }
+
+    private void throwExceptionIfInputScopeIsIncorrect(List<Integer> scoreOfThrow){
+        if (scoreOfThrow.size() > 5){
+            throw new IncorrectScoreOfThrowException("Throw contains too many numbers");
+        }
+        scoreOfThrow.forEach((number) -> {
+            if (number == 0){
+                throw new IncorrectScoreOfThrowException("The scope contains the number zero");
+            }
+        });
     }
 }

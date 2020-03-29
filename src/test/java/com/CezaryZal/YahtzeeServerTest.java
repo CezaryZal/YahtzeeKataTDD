@@ -1,5 +1,6 @@
 package com.CezaryZal;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -49,5 +50,20 @@ class YahtzeeServerTest {
         assertThat(collectedPoints).isEqualTo(8);
     }
 
+    @Test
+    void shouldThrowExceptionWhenSendScoreWithZeroNumber(){
+        List<Integer> scoreOfThrow = Arrays.asList(1, 4, 0, 3, 3);
+        String category = "Six";
+        Assertions.assertThrows(IncorrectScoreOfThrowException.class,
+                () -> yahtzeeServer.getCollectedPoint(scoreOfThrow, category));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenScoreSizeIsGreaterThanFive(){
+        List<Integer> scoreOfThrow = Arrays.asList(1, 4, 4, 2, 3, 3);
+        String category = "Six";
+        Assertions.assertThrows(IncorrectScoreOfThrowException.class,
+                () -> yahtzeeServer.getCollectedPoint(scoreOfThrow, category));
+    }
 
 }
