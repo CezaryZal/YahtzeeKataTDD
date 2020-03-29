@@ -4,6 +4,7 @@ import java.util.*;
 
 public class YahtzeeServer {
 
+    private final int pointForNotMatchesChooseCategory = 0;
     private final Map<String, Integer> pointTable = Map.of(
             "One", 1,
             "Two", 2,
@@ -15,26 +16,31 @@ public class YahtzeeServer {
     public int getCollectedPoint(List<Integer> scoreOfThrow, String category) {
         throwExceptionIfInputScopeIsIncorrect(scoreOfThrow);
 
-        if (pointTable.containsKey(category)) {
-            return getCollectedPointFromSingleCategory(scoreOfThrow, category);
-        }
+        return pointTable.containsKey(category) ?
+                getCollectedPointForSingleCategory(scoreOfThrow, category) :
+                matchSolutionForComplexCategory(scoreOfThrow, category);
+    }
+
+    private int matchSolutionForComplexCategory(List<Integer> scoreOfThrow, String category){
         Map<Integer, Integer> parsedScoreOfThrow = parseScoreOfThrow(scoreOfThrow);
 
         switch (category) {
             case "Pair":
                 return getCollectedPointForSimpleCategory(parsedScoreOfThrow, 2);
             case "Two Pair":
-                return getCollectedPointFromSecondPairCategory(parsedScoreOfThrow, 2);
+                return getCollectedPointForPairCategory(parsedScoreOfThrow, 2);
             case "Three of a kind":
                 return getCollectedPointForSimpleCategory(parsedScoreOfThrow, 3);
             case "Four of a kind":
                 return getCollectedPointForSimpleCategory(parsedScoreOfThrow, 4);
             case "Small Straight":
-                return getCollectedPointFromStraight(scoreOfThrow, 6, 15);
+                return getCollectedPointForStraight(scoreOfThrow, 6, 15);
             case "Large Straight":
-                return getCollectedPointFromStraight(scoreOfThrow, 1, 20);
+                return getCollectedPointForStraight(scoreOfThrow, 1, 20);
             case "Full House":
-                return getCollectedPointFromSecondPairCategory(parsedScoreOfThrow, 3);
+                return getCollectedPointForPairCategory(parsedScoreOfThrow, 3);
+            case "Chance":
+                return calculateSumOfAllDice(scoreOfThrow);
             case "Yahtzee":
                 if (getCollectedPointForSimpleCategory(parsedScoreOfThrow, 5) != 0){
                     return 50;
@@ -57,17 +63,15 @@ public class YahtzeeServer {
         return parsedScoreOfThrow;
     }
 
-    private int getCollectedPointFromStraight (
+    private int getCollectedPointForStraight(
             List<Integer> scoreOfThrow,
             int noPoint,
             int sumOfAllDice){
 
         int currentSumOfAllDice = calculateSumOfAllDice(scoreOfThrow);
 
-        if (!scoreOfThrow.contains(noPoint) && currentSumOfAllDice == sumOfAllDice){
-            return currentSumOfAllDice;
-        }
-        return 0;
+        return (!scoreOfThrow.contains(noPoint) && currentSumOfAllDice == sumOfAllDice) ?
+                currentSumOfAllDice : pointForNotMatchesChooseCategory;
     }
 
     private int calculateSumOfAllDice(List<Integer> scoreOfThrow){
@@ -77,7 +81,7 @@ public class YahtzeeServer {
                 .sum();
     }
 
-    private int getCollectedPointFromSecondPairCategory(
+    private int getCollectedPointForPairCategory(
             Map<Integer, Integer> parsedScoreOfThrow,
             int pointOfSecondPair) {
 
@@ -91,10 +95,13 @@ public class YahtzeeServer {
                 pointFromSecondPair = iteration.getKey();
             }
         }
-        if (pointFromFirstPair == 0 || pointFromSecondPair == 0) {
-            return 0;
-        }
-        return pointFromFirstPair * 2 + pointFromSecondPair * pointOfSecondPair;
+        return isConditionForPairCondition(pointFromFirstPair, pointFromSecondPair) ?
+                pointForNotMatchesChooseCategory :
+                pointFromFirstPair * 2 + pointFromSecondPair * pointOfSecondPair;
+    }
+
+    private boolean isConditionForPairCondition(int pointFromFirstPair, int pointFromSecondPair) {
+        return pointFromFirstPair == 0 || pointFromSecondPair == 0;
     }
 
     private int getCollectedPointForSimpleCategory(
@@ -105,10 +112,10 @@ public class YahtzeeServer {
                 .filter(grope -> grope.getValue() == numberOfGrope)
                 .mapToInt(grope -> grope.getKey() * numberOfGrope)
                 .max()
-                .orElse(0);
+                .orElse(pointForNotMatchesChooseCategory);
     }
 
-    private int getCollectedPointFromSingleCategory(List<Integer> scoreOfThrow, String category) {
+    private int getCollectedPointForSingleCategory(List<Integer> scoreOfThrow, String category) {
         Integer pointByCategory = pointTable.get(category);
 
         return scoreOfThrow.stream()
@@ -122,7 +129,7 @@ public class YahtzeeServer {
             throw new IncorrectScoreOfThrowException("Throw contains too many numbers");
         }
         scoreOfThrow.forEach((number) -> {
-            if (number == 0) {
+            if (number < 1) {
                 throw new IncorrectScoreOfThrowException("The scope contains the number zero");
             }
         });
