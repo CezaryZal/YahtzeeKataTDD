@@ -66,4 +66,12 @@ class YahtzeeServerTest {
                 () -> yahtzeeServer.getCollectedPoint(scoreOfThrow, category));
     }
 
+    @Test
+    void shouldGetReceiveResultFromTwoPairCategoryForThreeAndFourType() {
+        List<Integer> scoreOfThrow = Arrays.asList(1, 4, 4, 3, 3);
+        String category = "Two Pair";
+        int collectedPoints = yahtzeeServer.getCollectedPoint(scoreOfThrow, category);
+        assertThat(collectedPoints).isEqualTo(14);
+    }
+
 }
