@@ -130,4 +130,12 @@ class YahtzeeServerTest {
         assertThat(collectedPoints).isEqualTo(50);
     }
 
+    @Test
+    void shouldGetReceiveResultFromSmallStraightCategory() {
+        List<Integer> scoreOfThrow = Arrays.asList(2, 1, 3, 5, 4);
+        String category = "Small Straight";
+        int collectedPoints = yahtzeeServer.getCollectedPoint(scoreOfThrow, category);
+        assertThat(collectedPoints).isEqualTo(15);
+    }
+
 }
