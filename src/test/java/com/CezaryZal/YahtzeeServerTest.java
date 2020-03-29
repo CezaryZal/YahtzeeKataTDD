@@ -146,4 +146,12 @@ class YahtzeeServerTest {
         assertThat(collectedPoints).isEqualTo(20);
     }
 
+    @Test
+    void shouldGetReceiveResultFromFullHouseCategory() {
+        List<Integer> scoreOfThrow = Arrays.asList(1, 1, 2, 2, 2);
+        String category = "Full House";
+        int collectedPoints = yahtzeeServer.getCollectedPoint(scoreOfThrow, category);
+        assertThat(collectedPoints).isEqualTo(8);
+    }
+
 }

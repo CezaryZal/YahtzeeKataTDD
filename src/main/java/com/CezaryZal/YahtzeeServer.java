@@ -24,7 +24,7 @@ public class YahtzeeServer {
             case "Pair":
                 return getCollectedPointForSimpleCategory(parsedScoreOfThrow, 2);
             case "Two Pair":
-                return getCollectedPointFromTwoPairCategory(parsedScoreOfThrow);
+                return getCollectedPointFromSecondPairCategory(parsedScoreOfThrow, 2);
             case "Three of a kind":
                 return getCollectedPointForSimpleCategory(parsedScoreOfThrow, 3);
             case "Four of a kind":
@@ -33,6 +33,8 @@ public class YahtzeeServer {
                 return getCollectedPointFromStraight(scoreOfThrow, 6, 15);
             case "Large Straight":
                 return getCollectedPointFromStraight(scoreOfThrow, 1, 20);
+            case "Full House":
+                return getCollectedPointFromSecondPairCategory(parsedScoreOfThrow, 3);
             case "Yahtzee":
                 if (getCollectedPointForSimpleCategory(parsedScoreOfThrow, 5) != 0){
                     return 50;
@@ -75,21 +77,24 @@ public class YahtzeeServer {
                 .sum();
     }
 
-    private int getCollectedPointFromTwoPairCategory(Map<Integer, Integer> parsedScoreOfThrow) {
+    private int getCollectedPointFromSecondPairCategory(
+            Map<Integer, Integer> parsedScoreOfThrow,
+            int pointOfSecondPair) {
+
         int pointFromFirstPair = 0;
         int pointFromSecondPair = 0;
 
         for (Map.Entry<Integer, Integer> iteration : parsedScoreOfThrow.entrySet()) {
             if (iteration.getValue() == 2 && pointFromFirstPair == 0) {
                 pointFromFirstPair = iteration.getKey();
-            } else if (iteration.getValue() == 2) {
+            } else if (iteration.getValue() == pointOfSecondPair) {
                 pointFromSecondPair = iteration.getKey();
             }
         }
         if (pointFromFirstPair == 0 || pointFromSecondPair == 0) {
             return 0;
         }
-        return pointFromFirstPair * 2 + pointFromSecondPair * 2;
+        return pointFromFirstPair * 2 + pointFromSecondPair * pointOfSecondPair;
     }
 
     private int getCollectedPointForSimpleCategory(
