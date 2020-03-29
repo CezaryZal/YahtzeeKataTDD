@@ -1,7 +1,6 @@
 package com.CezaryZal;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class YahtzeeServer {
 
@@ -31,7 +30,9 @@ public class YahtzeeServer {
             case "Four of a kind":
                 return getCollectedPointForSimpleCategory(parsedScoreOfThrow, 4);
             case "Small Straight":
-                return getCollectedPointFromStraight(scoreOfThrow);
+                return getCollectedPointFromStraight(scoreOfThrow, 6, 15);
+            case "Large Straight":
+                return getCollectedPointFromStraight(scoreOfThrow, 1, 20);
             case "Yahtzee":
                 if (getCollectedPointForSimpleCategory(parsedScoreOfThrow, 5) != 0){
                     return 50;
@@ -54,17 +55,24 @@ public class YahtzeeServer {
         return parsedScoreOfThrow;
     }
 
-    private int getCollectedPointFromStraight (List<Integer> scoreOfThrow){
-        int sumOfAllDice = scoreOfThrow.stream()
+    private int getCollectedPointFromStraight (
+            List<Integer> scoreOfThrow,
+            int noPoint,
+            int sumOfAllDice){
+
+        int currentSumOfAllDice = calculateSumOfAllDice(scoreOfThrow);
+
+        if (!scoreOfThrow.contains(noPoint) && currentSumOfAllDice == sumOfAllDice){
+            return currentSumOfAllDice;
+        }
+        return 0;
+    }
+
+    private int calculateSumOfAllDice(List<Integer> scoreOfThrow){
+        return scoreOfThrow.stream()
                 .sorted(Comparator.reverseOrder())
                 .mapToInt(Integer::intValue)
                 .sum();
-
-        if (!scoreOfThrow.contains(6) && sumOfAllDice == 15){
-            return sumOfAllDice;
-        }
-        return 0;
-
     }
 
     private int getCollectedPointFromTwoPairCategory(Map<Integer, Integer> parsedScoreOfThrow) {
