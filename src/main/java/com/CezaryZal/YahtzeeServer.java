@@ -1,6 +1,8 @@
 package com.CezaryZal;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class YahtzeeServer {
 
@@ -14,37 +16,61 @@ public class YahtzeeServer {
 
     public int getCollectedPoint(List<Integer> scoreOfThrow, String category) {
         throwExceptionIfInputScopeIsIncorrect(scoreOfThrow);
+
+        if (pointTable.containsKey(category)) {
+            return getCollectedPointFromSingleCategory(scoreOfThrow, category);
+        }
+        Map<Integer, Integer> parsedScoreOfThrow = parseScoreOfThrow(scoreOfThrow);
+
         if (category.equals("Pair")) {
-            return getCollectedPointFromPairCategory(scoreOfThrow);
+            return getCollectedPointForSimpleCategory(parsedScoreOfThrow, 2);
         } else if (category.equals("Two Pair")) {
-            return getCollectedPointFromTwoPairCategory(scoreOfThrow);
+            return getCollectedPointFromTwoPairCategory(parsedScoreOfThrow);
+        } else if (category.equals("Three of a kind")) {
+            return getCollectedPointForSimpleCategory(parsedScoreOfThrow, 3);
         }
-        return getCollectedPointFromSingleCategory(scoreOfThrow, category);
+        throw new IncorrectCategoryException("The Category of throw is incorrect");
     }
 
-    private int getCollectedPointFromTwoPairCategory(List<Integer> scoreOfThrow) {
-        scoreOfThrow.sort(Comparator.reverseOrder());
-        int pointsFromThrow = 0;
+    private Map<Integer, Integer> parseScoreOfThrow(List<Integer> scoreOfThrow) {
+        Map<Integer, Integer> parsedScoreOfThrow = new HashMap<>();
 
-        pointsFromThrow += calculatePointsForPairCategory(scoreOfThrow, 0);
-        pointsFromThrow += calculatePointsForPairCategory(scoreOfThrow, 2);
-
-        return pointsFromThrow;
-    }
-
-    private int getCollectedPointFromPairCategory(List<Integer> scoreOfThrow) {
-        scoreOfThrow.sort(Comparator.reverseOrder());
-
-        return calculatePointsForPairCategory(scoreOfThrow, 0);
-    }
-
-    private int calculatePointsForPairCategory(List<Integer> scoreOfThrow, int StartingIndex) {
-        Integer maxPointFromThrow = scoreOfThrow.get(StartingIndex);
-        if (maxPointFromThrow.equals(scoreOfThrow.get(++StartingIndex)) &&
-                !maxPointFromThrow.equals(scoreOfThrow.get(++StartingIndex))) {
-            return maxPointFromThrow * 2;
+        for (Integer point : scoreOfThrow) {
+            if (parsedScoreOfThrow.containsKey(point)) {
+                Integer pointFromMap = parsedScoreOfThrow.get(point);
+                parsedScoreOfThrow.replace(point, ++pointFromMap);
+            }
+            parsedScoreOfThrow.putIfAbsent(point, 1);
         }
-        return 0;
+        return parsedScoreOfThrow;
+    }
+
+    private int getCollectedPointFromTwoPairCategory(Map<Integer, Integer> parsedScoreOfThrow) {
+        int pointFromFirstPair = 0;
+        int pointFromSecondPair = 0;
+
+        for (Map.Entry<Integer, Integer> iteration : parsedScoreOfThrow.entrySet()) {
+            if (iteration.getValue() == 2 && pointFromFirstPair == 0) {
+                pointFromFirstPair = iteration.getKey();
+            } else if (iteration.getValue() == 2) {
+                pointFromSecondPair = iteration.getKey();
+            }
+        }
+        if (pointFromFirstPair == 0 || pointFromSecondPair == 0) {
+            return 0;
+        }
+        return pointFromFirstPair * 2 + pointFromSecondPair * 2;
+    }
+
+    private int getCollectedPointForSimpleCategory(
+            Map<Integer, Integer> parsedScoreOfThrow,
+            int simpleCategory) {
+
+        return parsedScoreOfThrow.entrySet().stream()
+                .filter(grope -> grope.getValue() == simpleCategory)
+                .mapToInt(grope -> grope.getKey() * simpleCategory)
+                .max()
+                .orElse(0);
     }
 
     private int getCollectedPointFromSingleCategory(List<Integer> scoreOfThrow, String category) {

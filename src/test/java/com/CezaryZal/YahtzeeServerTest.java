@@ -51,6 +51,14 @@ class YahtzeeServerTest {
     }
 
     @Test
+    void shouldGetReceiveResultFromPairCategoryForThreeType() {
+        List<Integer> scoreOfThrow = Arrays.asList(1, 4, 2, 3, 3);
+        String category = "Pair";
+        int collectedPoints = yahtzeeServer.getCollectedPoint(scoreOfThrow, category);
+        assertThat(collectedPoints).isEqualTo(6);
+    }
+
+    @Test
     void shouldThrowExceptionWhenSendScoreWithZeroNumber(){
         List<Integer> scoreOfThrow = Arrays.asList(1, 4, 0, 3, 3);
         String category = "Six";
@@ -72,6 +80,38 @@ class YahtzeeServerTest {
         String category = "Two Pair";
         int collectedPoints = yahtzeeServer.getCollectedPoint(scoreOfThrow, category);
         assertThat(collectedPoints).isEqualTo(14);
+    }
+
+    @Test
+    void shouldGetReceiveResultFromTwoPairCategoryForTwoAndThreeType() {
+        List<Integer> scoreOfThrow = Arrays.asList(2, 2, 3, 3, 3);
+        String category = "Two Pair";
+        int collectedPoints = yahtzeeServer.getCollectedPoint(scoreOfThrow, category);
+        assertThat(collectedPoints).isEqualTo(0);
+    }
+
+    @Test
+    void shouldGetReceiveResultFromTwoPairCategoryForThreeAndTwoType() {
+        List<Integer> scoreOfThrow = Arrays.asList(3, 3, 3, 2, 2);
+        String category = "Two Pair";
+        int collectedPoints = yahtzeeServer.getCollectedPoint(scoreOfThrow, category);
+        assertThat(collectedPoints).isEqualTo(0);
+    }
+
+    @Test
+    void shouldGetReceiveResultFromThreeGropeCategoryForThreeType() {
+        List<Integer> scoreOfThrow = Arrays.asList(1, 3, 4, 3, 3);
+        String category = "Three of a kind";
+        int collectedPoints = yahtzeeServer.getCollectedPoint(scoreOfThrow, category);
+        assertThat(collectedPoints).isEqualTo(9);
+    }
+
+    @Test
+    void shouldGetReceiveResultFromThreeGropeCategoryForSixType() {
+        List<Integer> scoreOfThrow = Arrays.asList(6, 3, 6, 3, 6);
+        String category = "Three of a kind";
+        int collectedPoints = yahtzeeServer.getCollectedPoint(scoreOfThrow, category);
+        assertThat(collectedPoints).isEqualTo(18);
     }
 
 }
