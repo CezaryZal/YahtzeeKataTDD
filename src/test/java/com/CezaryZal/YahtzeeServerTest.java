@@ -1,5 +1,6 @@
 package com.CezaryZal;
 
+import com.CezaryZal.exceptions.IncorrectScoreOfThrowException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
